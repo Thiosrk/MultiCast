@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 @Controller
 public class UserController {
@@ -18,9 +21,24 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @RequestMapping("/index")
+    @RequestMapping("/home")
     public String index(){
-        return "index";
+        return "home";
+    }
+
+    @RequestMapping(value = "/",method = RequestMethod.GET)
+    public String welcome(){
+        return "login";
+    }
+
+    @RequestMapping(value = "/login",method = RequestMethod.GET)
+    public String login(){
+        return "login";
+    }
+
+    @RequestMapping(value = "/register",method = RequestMethod.GET)
+    public String register(){
+        return "register";
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
@@ -34,17 +52,45 @@ public class UserController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ModelAndView Login(Model model, HttpServletRequest request) {
-        HttpSession httpSession = request.getSession();
+    public void Login(Model model, HttpServletRequest request,HttpServletResponse response) throws IOException {
+        HttpSession session = request.getSession();
         String username = request.getParameter("username");
+        String password = request.getParameter("password");
+        System.out.println("username:"+username);
+        System.out.println("password:"+password);
+
         User user = userService.getUserByUserName(username);
 
-        if (request.getParameter("password").equals(user.getPassword())) {
-            httpSession.setAttribute("username", username);
-            return new ModelAndView("redirect:/index");
-        } else {
-            return new ModelAndView("redirect:/passwordWrong");
+        int flag = 0 ;//默认0不成功，1管理员，2用户
+        if (user!=null && password.equals(user.getPassword())){
+            session.setAttribute("userID",user.getId());
+            session.setAttribute("username",user.getUsername());
+//            model.addAttribute("user",user);
+            if (user.getAuthority() == 1){
+//                return new ModelAndView("redirect:/admin/home");
+                flag = 1;
+                System.out.println("管理员");
+            }else if(user.getAuthority() == 0) {
+//                return new ModelAndView("redirect:/user/
+                flag = 2;
+                System.out.println("用户");
+            }
+            else {
+                flag = 0;
+                System.out.println("有问题");
+//                return new ModelAndView("redirect:/login");
+            }
+        }else {
+//            return new ModelAndView("redirect:/login",map);
+            flag = 0;
+            System.out.println("密码错误");
         }
+        System.out.println("flag is : "+flag);
+        response.setContentType("text/html;charset=utf-8");
+        PrintWriter out = response.getWriter();
+        out.print(flag);//返回登录信息
+        out.flush();
+        out.close();
     }
 
 

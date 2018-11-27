@@ -8,13 +8,16 @@ import java.util.List;
 
 public interface UserService {
 
-    public List<User> getAll();
+    List<User> getAll();
 
-    public User getUserById(int id);
+    User getUserById(int id);
 
-    public User getUserByUserName(String username);
+    User getUserByUserName(String username);
 
-    public void createUser(User user);
+    void saveUser(User user);
 
+    User modifyUser(User user);
+
+    void delete(int userid);
 
 }

@@ -1,20 +1,31 @@
 package com.MultiCast.model;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "user")
 public class User {
 
+    @Id
+    @GeneratedValue
     private int id;
 
     private String username;
 
     private String password;
 
-    public User(){    }
+    private int authority;//权限 0：用户，1：管理员
 
-    public User(String username,String password){
+    public User(){}
+
+    public User(String username,String password,int authority){
         super();
         this.username = username;
         this.password = password;
+        this.authority = authority;
     }
 
     public int getId() {
@@ -41,5 +52,11 @@ public class User {
         this.password = password;
     }
 
+    public int getAuthority() {
+        return authority;
+    }
 
+    public void setAuthority(int authority) {
+        this.authority = authority;
+    }
 }

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<link th:href="@{/css/bootstrap.min.css}" rel='stylesheet' type='text/css'/>
+<link th:href="@{/css/fileinput.min.css}" rel='stylesheet' type='text/css'/>
+
+
+<body>
+
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed"
+                    data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+                    aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span> <span
+                    class="icon-bar"></span> <span class="icon-bar"></span> <span
+                    class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/home"><span
+                    class="glyphicon glyphicon-home" aria-hidden="true"></span></a>
+        </div>
+        <div class="collapse navbar-collapse"
+             id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li><a href="/home">主页</a></li>
+                <li><a href="/sendEmails">写邮件</a></li>
+                <li><a href="/receiveEmails">收件箱</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a>欢迎，</a></li>
+                <li><a th:text="${session.username}"></a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-10"></div>
+    <div class="col-md-1"></div>
+</div>
+
+
+
+<div class="col-lg-offset-4 col-lg-6 panel-body">
+    <div class="container-fluid">
+        <form id="form" action="upload/insert" method="post" enctype="multipart/form-data">
+            <div class="row form-group">
+                <label class="col-md-12">广播文件上传:</label>
+                <div class="col-md-8">
+                    <input id="input-id" name="file" type="file" data-show-caption="true">
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<!--<input type="file" name="txt_file" id="txt_file" multiple class="file-loading" />-->
+</body>
+
+<script type="text/javascript" th:src="@{/js/jquery-3.3.1.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/bootstrap.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/fileinput.min.js}"></script>
+<script type="text/javascript">
+    $(function () {
+        initFileInput("input-id");
+    })
+
+    function initFileInput(ctrlName) {
+        var control = $('#' + ctrlName);
+        control.fileinput({
+            language: 'zh', //设置语言
+            uploadUrl: "upload/insert", //上传的地址
+            // allowedFileExtensions: ['jpg', 'gif', 'png'],//接收的文件后缀
+            //uploadExtraData:{"id": 1, "fileName":'123.mp3'},
+            uploadAsync: true, //默认异步上传
+            showUpload: true, //是否显示上传按钮
+            showRemove : true, //显示移除按钮
+            showPreview : true, //是否显示预览
+            showCaption: false,//是否显示标题
+            browseClass: "btn btn-primary", //按钮样式
+            //dropZoneEnabled: true,//是否显示拖拽区域
+            //minImageWidth: 50, //图片的最小宽度
+            //minImageHeight: 50,//图片的最小高度
+            //maxImageWidth: 1000,//图片的最大宽度
+            //maxImageHeight: 1000,//图片的最大高度
+            //maxFileSize: 0,//单位为kb，如果为0表示不限制文件大小
+            //minFileCount: 0,
+            maxFileCount: 1, //表示允许同时上传的最大文件个数
+            enctype: 'multipart/form-data',
+            validateInitialCount:true,
+            previewFileIcon: "<i class='glyphicon glyphicon-king'></i>",
+            msgFilesTooMany: "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+
+        }).on('filepreupload', function(event, data, previewId, index) {     //上传中
+            var form = data.form, files = data.files, extra = data.extra,
+                response = data.response, reader = data.reader;
+            console.log('文件正在上传');
+        }).on("fileuploaded", function (event, data, previewId, index) {    //一个文件上传成功
+            console.log('文件上传成功！'+data.id);
+
+        }).on('fileerror', function(event, data, msg) {  //一个文件上传失败
+            console.log('文件上传失败！'+data.id);
+
+
+        })
+    }
+</script>
+
+
+</html>
