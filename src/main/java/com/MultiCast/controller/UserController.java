@@ -18,6 +18,11 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @RequestMapping("/index")
+    public String index(){
+        return "index";
+    }
+
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ModelAndView Register(Model model, HttpServletRequest request) {
         HttpSession httpSession = request.getSession();
