@@ -1,9 +1,20 @@
 package com.MultiCast.controller;
 
 import com.MultiCast.util.MultiCast_Server;
+import com.MultiCast.util.MultipartFileUtil;
+import com.MultiCast.util.WebSocketServer;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 
 @Controller
 public class ServerController {
@@ -16,11 +27,50 @@ public class ServerController {
     }
 
     @RequestMapping(value = "/start",method = RequestMethod.GET)
-    public String start(){
+    public String start(HttpServletRequest request){
+        HttpSession session = request.getSession();
+        String filecontent = (String) session.getAttribute("filecontent");
         System.out.println("startserver!");
+        System.out.println(filecontent);
         m = MultiCast_Server.getInstance();
         m.init();
-        m.send();
+        m.send(filecontent);
+        return "redirect:/manager";
+    }
+
+    @RequestMapping("/uploadfile")
+    public String insert(HttpServletRequest request, HttpServletResponse response
+            , @RequestParam("file") MultipartFile[] files) throws Exception{
+
+        HttpSession session = request.getSession();
+
+        MultipartFileUtil.empty();
+        MultipartFileUtil.toFiles(files);
+        File file = MultipartFileUtil.getFileList().get(0);
+        BufferedReader reader = null;
+        String ans = "";
+        try{
+            reader = new BufferedReader(new FileReader(file));
+            String tmpString = null;
+            //一行一行的读取文件里面的内容
+            while((tmpString = reader.readLine()) != null){
+                System.out.println(tmpString);
+                ans += tmpString + "\n";//保存在ans里面
+            }
+        }catch(IOException e){
+            e.printStackTrace();
+        }finally{
+            if(reader != null) {
+                try{
+                    reader.close();
+                }catch(IOException e1){
+                    e1.printStackTrace();
+                }
+            }
+        }
+
+        session.setAttribute("filecontent", ans);
+
         return "redirect:/manager";
     }
 
@@ -30,5 +80,7 @@ public class ServerController {
         m.stop();
         return "redirect:/manager";
     }
+
+
 
 }

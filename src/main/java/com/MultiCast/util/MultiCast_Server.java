@@ -61,7 +61,7 @@ public class MultiCast_Server {
         }
     }
 
-    public void send(){
+    public void send(String message){
         System.out.println("loop send");
         new Thread(){
 
@@ -70,7 +70,6 @@ public class MultiCast_Server {
 //                Scanner s = new Scanner(System.in);
                 while(!exit){
                     try {
-                        String message = "hello world";
                         byte[] buf = message.getBytes("UTF-8"); //发送信息
 //            socket.setLoopbackMode(false);
                         outPacket = new DatagramPacket(buf,buf.length,broadcastAddress,BROADCAST_PORT);

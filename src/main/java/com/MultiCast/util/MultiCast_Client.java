@@ -75,9 +75,9 @@ public class MultiCast_Client {
 
     public static void main(String[] args) {
         MultiCast_Client m = new MultiCast_Client();
-//        m.init();
-//        m.receive();
-        m.stop();
+        m.init();
+        m.receive();
+//        m.stop();
     }
 
 }
