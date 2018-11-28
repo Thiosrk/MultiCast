@@ -17,7 +17,20 @@ public class MultiCast_Client {
     // 定义一个用于接收的DatagramPacket对象
     private DatagramPacket inPacket = null;
 
+    private Boolean exit;
+
+    private MultiCast_Client() {}
+
+    private static class MultiCast_Client_Instance {
+        private static final MultiCast_Client INSTANCE = new MultiCast_Client();
+    }
+
+    public static MultiCast_Client getInstance() {
+        return MultiCast_Client_Instance.INSTANCE;
+    }
+
     public void init(){
+        exit = false;
         try {
             socket = new MulticastSocket(BROADCAST_PORT);
             broadcastAddress = InetAddress.getByName(BROADCAST_IP);
@@ -28,12 +41,23 @@ public class MultiCast_Client {
 
     }
 
+    public void stop(){
+        exit = true;
+        System.out.println("stop receive!");
+        try {
+            socket.leaveGroup(broadcastAddress);
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void receive(){
         new Thread(){
 
             @Override
             public void run() {
-                while(true){
+                while(!exit){
                     try{
                         byte[] buf = new byte[128]; //接收数据缓冲
                         inPacket = new DatagramPacket(buf, buf.length); //接收数据的数据报
@@ -47,10 +71,13 @@ public class MultiCast_Client {
         }.start();
     }
 
+
+
     public static void main(String[] args) {
         MultiCast_Client m = new MultiCast_Client();
-        m.init();
-        m.receive();
+//        m.init();
+//        m.receive();
+        m.stop();
     }
 
 }

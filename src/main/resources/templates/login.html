@@ -68,7 +68,7 @@
                 // alert(data);
                 if(data == 0){
                     console.log("登录失败");
-                    alert("登录失败");
+                    alert("登录失败,密码错误！");
                     // loginform.username.focus();
                     return false;
                 }else if (data == 1) {
@@ -82,7 +82,7 @@
                     //         clearInterval(interval);
                     //     };
                     // }, 1000);
-                    window.location.href = "/home";//跳转到主页
+                    window.location.href = "/manager";//跳转到主页
                     console.log("登录管理员成功");
                 }else if (data == 2) {
                     window.location.href = "/home";//跳转到主页

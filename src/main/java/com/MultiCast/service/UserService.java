@@ -14,7 +14,7 @@ public interface UserService {
 
     User getUserByUserName(String username);
 
-    void saveUser(User user);
+    void addUser(String username,String password);
 
     User modifyUser(User user);
 

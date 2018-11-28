@@ -30,7 +30,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void saveUser(User user) {
+    public void addUser(String username,String password) {
+        User user = new User(username,password,0);
         userRepository.save(user);
     }
 

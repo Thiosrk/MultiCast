@@ -18,16 +18,24 @@
 
 		<div class="col-md-4">
 			<h3>注册</h3>
-			<form action="/register" method="post">
+			<form th:action="@{/register}" th:method="post">
+
+				<!--<button type="submit" class="btn btn-warning">Register</button>-->
+
 				<div class="form-group">
-					<label for="name">Name:</label> <input name="name_re"
-						class="form-control" id="name" placeholder="name">
+					<label for="username">Username:</label>
+					<input name="username" type="text" class="form-control" id="username" placeholder="username" required="required" >
 				</div>
 				<div class="form-group">
-					<label for="password">Password:</label> <input name="password_re"
-						class="form-control" id="password" placeholder="password">
+					<label for="password">Password:</label>
+					<input name="password" type="password" class="form-control" id="password" placeholder="password" required="required">
 				</div>
-				<button type="submit" class="btn btn-warning">Register</button>
+				<div class="form-group" align="right">
+					<!--<button type="submit" class="btn btn-warning">Login</button>-->
+					<input type="submit" class="btn btn-warning" value="Sign up" />
+					<!--<a href="/register">没有账号? 点我注册</a>-->
+					 <a href="/login">已有账号? 点击登录 </a>
+				</div>
 			</form>
 		</div>
 		<div class="col-md-4"></div>

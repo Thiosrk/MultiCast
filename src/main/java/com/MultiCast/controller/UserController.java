@@ -2,6 +2,7 @@ package com.MultiCast.controller;
 
 import com.MultiCast.model.User;
 import com.MultiCast.service.UserService;
+import com.MultiCast.util.MultiCast_Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,9 +22,16 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    MultiCast_Client m;
+
     @RequestMapping("/home")
-    public String index(){
+    public String home(){
         return "home";
+    }
+
+    @RequestMapping("/manager")
+    public String manager(){
+        return "manager";
     }
 
     @RequestMapping(value = "/",method = RequestMethod.GET)
@@ -41,14 +49,20 @@ public class UserController {
         return "register";
     }
 
+    @RequestMapping("/logout")
+    public String logout(HttpServletRequest request){
+        request.getSession().removeAttribute("username");
+        return "redirect:/";
+    }
+
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ModelAndView Register(Model model, HttpServletRequest request) {
         HttpSession httpSession = request.getSession();
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-//        userService.creat(name, password);
+        userService.addUser(username, password);
         httpSession.setAttribute("username", username);
-        return new ModelAndView("redirect:/index");
+        return new ModelAndView("redirect:/home");
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
@@ -63,25 +77,19 @@ public class UserController {
 
         int flag = 0 ;//默认0不成功，1管理员，2用户
         if (user!=null && password.equals(user.getPassword())){
-            session.setAttribute("userID",user.getId());
             session.setAttribute("username",user.getUsername());
-//            model.addAttribute("user",user);
             if (user.getAuthority() == 1){
-//                return new ModelAndView("redirect:/admin/home");
                 flag = 1;
                 System.out.println("管理员");
             }else if(user.getAuthority() == 0) {
-//                return new ModelAndView("redirect:/user/
                 flag = 2;
                 System.out.println("用户");
             }
             else {
                 flag = 0;
                 System.out.println("有问题");
-//                return new ModelAndView("redirect:/login");
             }
         }else {
-//            return new ModelAndView("redirect:/login",map);
             flag = 0;
             System.out.println("密码错误");
         }
@@ -91,6 +99,21 @@ public class UserController {
         out.print(flag);//返回登录信息
         out.flush();
         out.close();
+    }
+
+    @RequestMapping("/receive")
+    public String receive(){
+        m = MultiCast_Client.getInstance();
+        m.init();
+        m.receive();
+        return "redirect:/home";
+    }
+
+    @RequestMapping("/stop")
+    public String stop(){
+        m = MultiCast_Client.getInstance();
+        m.stop();
+        return "redirect:/home";
     }
 
 

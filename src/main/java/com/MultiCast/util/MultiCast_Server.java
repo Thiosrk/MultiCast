@@ -18,7 +18,22 @@ public class MultiCast_Server {
     // 定义一个用于发送的DatagramPacket对象
     private DatagramPacket outPacket = null;
 
+    private Boolean exit;
+
+
+        private MultiCast_Server() {}
+
+        private static class MultiCast_Server_Instance {
+            private static final MultiCast_Server INSTANCE = new MultiCast_Server();
+        }
+
+        public static MultiCast_Server getInstance() {
+            return MultiCast_Server_Instance.INSTANCE;
+        }
+
     public void init(){
+        System.out.println("server init!");
+        exit = false;
         try {
             socket = new MulticastSocket(BROADCAST_PORT);
             broadcastAddress = InetAddress.getByName(BROADCAST_IP);
@@ -30,7 +45,15 @@ public class MultiCast_Server {
     }
 
     public void stop(){
+        System.out.println("stop server!");
+//        Thread.currentThread().interrupt();
+        exit = true;
         try {
+            String message = "stop server!";
+            byte[] buf = message.getBytes("UTF-8"); //发送信息
+//            socket.setLoopbackMode(false);
+            outPacket = new DatagramPacket(buf,buf.length,broadcastAddress,BROADCAST_PORT);
+            socket.send(outPacket);
             socket.leaveGroup(broadcastAddress);
             socket.close();
         } catch (IOException e) {
@@ -39,14 +62,15 @@ public class MultiCast_Server {
     }
 
     public void send(){
+        System.out.println("loop send");
         new Thread(){
 
             @Override
             public void run() {
-                Scanner s = new Scanner(System.in);
-                while(true){
+//                Scanner s = new Scanner(System.in);
+                while(!exit){
                     try {
-                        String message = Integer.toString(s.nextInt());
+                        String message = "hello world";
                         byte[] buf = message.getBytes("UTF-8"); //发送信息
 //            socket.setLoopbackMode(false);
                         outPacket = new DatagramPacket(buf,buf.length,broadcastAddress,BROADCAST_PORT);
@@ -65,9 +89,10 @@ public class MultiCast_Server {
     }
 
     public static void main(String[] args) {
-        MultiCast_Server m = new MultiCast_Server();
-        m.init();
-        m.send();
+        MultiCast_Server m = MultiCast_Server.getInstance();
+//        m.init();
+//        m.send();
+        m.stop();
     }
 
 

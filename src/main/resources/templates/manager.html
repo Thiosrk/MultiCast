@@ -21,19 +21,19 @@
                     class="icon-bar"></span> <span class="icon-bar"></span> <span
                     class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/home"><span
+            <a class="navbar-brand" href="/manager"><span
                     class="glyphicon glyphicon-home" aria-hidden="true"></span></a>
         </div>
         <div class="collapse navbar-collapse"
              id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li><a href="/home">主页</a></li>
-                <!--<li><a href="/sendEmails">写邮件</a></li>-->
-                <!--<li><a href="/receiveEmails">收件箱</a></li>-->
+                <li><a href="/manager">主页</a></li>
+                <li><a href="#broadcast" data-toggle="tab">广播管理</a></li>
+                <li><a href="#upload" data-toggle="tab">上传广播文件</a></li>
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li><a th:text="|欢迎, ${session.username}|"></a></li>
+                <li><a th:text="|欢迎管理员, ${session.username}|"></a></li>
                 <!--<li></li>-->
                 <!--<li><a href="/receiveEmails">收件箱</a></li>-->
                 <li><a th:href="@{/logout}"><span class="fa fa-sign-out"></span> 退出</a></li>
@@ -41,29 +41,36 @@
         </div>
     </div>
 </nav>
+
 <div class="row">
-    <div class="col-md-1"></div>
-    <div class="col-md-10">
-        <div class="panel-body">
-            <label for="decodedData">单词广播</label>
-            <textarea class="form-control" id="decodedData" name="decodedData"
-                      rows="10" readonly></textarea>
-            <div align="right">
-                <button class="btn btn-info" href="/start">开始接收</button>
-                <button class="btn btn-danger" href="/start">停止接收</button>
+
+    <div class="tab-pane fade active in" id="broadcast">
+        <div class="col-lg-offset-4 col-lg-6 panel-body">
+            <div class="container-fluid">
+                <a class="btn btn-info" th:href="@{/start}">开始广播</a>
+                <a class="btn btn-danger" th:href="@{/stop}">停止广播</a>
             </div>
-
         </div>
-        <div class="panel-body">
-            <label for="decodedData">答题</label>
-            <text class="form-control" id="decodedData1" readonly></text>
-            <input type="text" name="answer" class="form-control" placeholder="..."required>
-            <!--<input name="username" type="text" class="form-control" id="username" placeholder="username" required="required" >-->
-        </div>
-
     </div>
-    <div class="col-md-1"></div>
+
+    <div class="tab-pane fade " id="upload">
+        <div class="col-lg-offset-4 col-lg-6 panel-body">
+            <div class="container-fluid">
+                <form id="form" action="upload/insert" method="post" enctype="multipart/form-data">
+                    <div class="row form-group">
+                        <label class="col-md-12">广播文件上传:</label>
+                        <div class="col-md-8">
+                            <input id="input-id" name="file" type="file" data-show-caption="true">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </div>
+
+
 
 
 
