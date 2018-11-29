@@ -45,18 +45,18 @@
     <div class="col-md-1"></div>
     <div class="col-md-10">
         <div class="panel-body">
-            <label for="decodedData">单词广播</label>
-            <textarea class="form-control" id="decodedData" name="decodedData"
-                      rows="10" readonly></textarea>
+            <label >单词广播</label>
+            <textarea class="form-control" th:text="${session.word}" rows="1" readonly></textarea>
+            <a class="btn btn-warning" th:href="@{/next}">下一个</a>
             <div align="right">
-                <button class="btn btn-info" href="/start">开始接收</button>
-                <button class="btn btn-danger" href="/start">停止接收</button>
+                <a class="btn btn-info" th:href="@{/receive}">开始接收</a>
+                <a class="btn btn-danger" th:href="@{/stop}">停止接收</a>
             </div>
 
         </div>
         <div class="panel-body">
-            <label for="decodedData">答题</label>
-            <text class="form-control" id="decodedData1" readonly></text>
+            <label >答题</label>
+            <text class="form-control" id="decodedData1"></text>
             <input type="text" name="answer" class="form-control" placeholder="..."required>
             <!--<input name="username" type="text" class="form-control" id="username" placeholder="username" required="required" >-->
         </div>

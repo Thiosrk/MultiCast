@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class MultiCast_Server {
@@ -20,6 +22,8 @@ public class MultiCast_Server {
 
     private Boolean exit;
 
+    int i ;
+
 
         private MultiCast_Server() {}
 
@@ -34,6 +38,7 @@ public class MultiCast_Server {
     public void init(){
         System.out.println("server init!");
         exit = false;
+        i=0;
         try {
             socket = new MulticastSocket(BROADCAST_PORT);
             broadcastAddress = InetAddress.getByName(BROADCAST_IP);
@@ -63,6 +68,8 @@ public class MultiCast_Server {
 
     public void send(String message){
         System.out.println("loop send");
+        List<String> words = getWords(message);
+
         new Thread(){
 
             @Override
@@ -70,7 +77,7 @@ public class MultiCast_Server {
 //                Scanner s = new Scanner(System.in);
                 while(!exit){
                     try {
-                        byte[] buf = message.getBytes("UTF-8"); //发送信息
+                        byte[] buf = words.get(i).getBytes("UTF-8"); //发送信息
 //            socket.setLoopbackMode(false);
                         outPacket = new DatagramPacket(buf,buf.length,broadcastAddress,BROADCAST_PORT);
                         socket.send(outPacket);
@@ -80,6 +87,10 @@ public class MultiCast_Server {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                    if (i<words.size()-1)
+                        i++;
+                    else
+                        i=0;
                 }
             }
 
@@ -87,11 +98,32 @@ public class MultiCast_Server {
 
     }
 
+    private List<String> getWords(String message) {
+
+            List<String> words = new ArrayList<>();
+            String[] tmp = message.split("\n");
+            for (String t : tmp){
+                words.add(t);
+            }
+            return words;
+
+    }
+
     public static void main(String[] args) {
         MultiCast_Server m = MultiCast_Server.getInstance();
-//        m.init();
-//        m.send();
-        m.stop();
+        String a = "alter   改变\n" +
+                "burst   爆裂\n" +
+                "dispose 处理\n" +
+                "blast   爆炸\n" +
+                "consume 消耗\n" +
+                "split   分裂\n" +
+                "spit    唾弃\n" +
+                "spill   倒出\n" +
+                "slip    忽略\n" +
+                "slide   滑动";
+        m.init();
+        m.send(a);
+//        m.stop();
     }
 
 

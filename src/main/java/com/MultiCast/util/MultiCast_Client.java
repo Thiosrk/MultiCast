@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.util.HashMap;
+import java.util.List;
 
 public class MultiCast_Client {
 
@@ -19,6 +21,10 @@ public class MultiCast_Client {
 
     private Boolean exit;
 
+    private HashMap<Long,String> wordsMap;
+
+    long i;
+
     private MultiCast_Client() {}
 
     private static class MultiCast_Client_Instance {
@@ -30,6 +36,7 @@ public class MultiCast_Client {
     }
 
     public void init(){
+        i = 0;
         exit = false;
         try {
             socket = new MulticastSocket(BROADCAST_PORT);
@@ -54,24 +61,40 @@ public class MultiCast_Client {
 
     public void receive(){
         new Thread(){
-
             @Override
             public void run() {
+                wordsMap = new HashMap<>();
                 while(!exit){
+                    i++;
                     try{
                         byte[] buf = new byte[128]; //接收数据缓冲
                         inPacket = new DatagramPacket(buf, buf.length); //接收数据的数据报
                         socket.receive(inPacket); //接收数据
-                        System.out.println(new String(buf,"UTF-8")); //输出接收到的数据
+                        String word = new String(buf,"UTF-8");
+                        System.out.println(word); //输出接收到的数据
+                        Thread.sleep(500);
+                        if (i<=50){
+                            wordsMap.put(i,word);
+                            System.out.println("just put: "+i+":"+word);
+                        }else {
+                            System.out.println("delete: "+(i-50)+":"+wordsMap.get(i-50));
+                            wordsMap.remove(i-50);
+                            wordsMap.put(i,word);
+                            System.out.println("put: "+i+":"+word);
+                            System.out.println("size: "+wordsMap.size());
+                        }
                     }catch(Exception e){
                         e.printStackTrace();
                     }
                 }
             }
         }.start();
+
     }
 
-
+    public HashMap<Long , String> getWordsMap() {
+        return wordsMap;
+    }
 
     public static void main(String[] args) {
         MultiCast_Client m = new MultiCast_Client();

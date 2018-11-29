@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Controller
 public class UserController {
@@ -105,14 +105,50 @@ public class UserController {
         out.close();
     }
 
-
-
-
     @RequestMapping("/receive")
-    public String receive(){
+    public String receive(Model model, HttpServletRequest request){
+//        HashMap<Long,String> map = new HashMap<>();
         m = MultiCast_Client.getInstance();
         m.init();
         m.receive();
+//        map = m.getWordsMap();
+//        Iterator iterator = map.entrySet().iterator();
+//        Map.Entry entry = (Map.Entry) iterator.next();
+//        long key = (long) entry.getKey();
+//        String word = map.get(key);
+//        model.addAttribute("word",word);
+        return "redirect:/home";
+    }
+
+    @RequestMapping("/next")
+    public String next(Model model, HttpServletRequest request){
+        HttpSession session = request.getSession();
+        HashMap<Long,String> map = new HashMap<>();
+        m = MultiCast_Client.getInstance();
+//        m.init();
+//        m.receive();
+        map = m.getWordsMap();
+        String word;
+        long key;
+        if (session.getAttribute("word") == null){
+            System.out.println("2222222222222222222222");
+            Iterator iterator = map.entrySet().iterator();
+            Map.Entry entry = (Map.Entry) iterator.next();
+            key = (long) entry.getKey();
+            word = map.get(key);
+        }else {
+            word = (String)session.getAttribute("word");
+            key = (long)session.getAttribute("key");
+            System.out.println("111111111111111111111111");
+            key++;
+            word = map.get(key);
+        }
+
+
+        System.out.println("get next word :"+word);
+//        model.addAttribute("word",word);
+        session.setAttribute("key",key);
+        session.setAttribute("word",word);
         return "redirect:/home";
     }
 

@@ -11,10 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 @Controller
 public class ServerController {
@@ -44,13 +41,14 @@ public class ServerController {
 
         HttpSession session = request.getSession();
 
-        MultipartFileUtil.empty();
-        MultipartFileUtil.toFiles(files);
-        File file = MultipartFileUtil.getFileList().get(0);
-        BufferedReader reader = null;
+//        MultipartFileUtil.empty();
+//        MultipartFileUtil.toFiles(files);
+//        File file = MultipartFileUtil.getFileList().get(0);
+        MultipartFile multipartFiles = files[0];
+        InputStreamReader inputStreamReader = new InputStreamReader(multipartFiles.getInputStream(),"UTF-8");
+        BufferedReader reader = new BufferedReader(inputStreamReader);
         String ans = "";
         try{
-            reader = new BufferedReader(new FileReader(file));
             String tmpString = null;
             //一行一行的读取文件里面的内容
             while((tmpString = reader.readLine()) != null){
@@ -74,7 +72,7 @@ public class ServerController {
         return "redirect:/manager";
     }
 
-    @RequestMapping(value = "/stop",method = RequestMethod.GET)
+    @RequestMapping(value = "/close",method = RequestMethod.GET)
     public String stop(){
         m = MultiCast_Server.getInstance();
         m.stop();
