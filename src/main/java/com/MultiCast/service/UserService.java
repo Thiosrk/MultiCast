@@ -1,7 +1,6 @@
 package com.MultiCast.service;
 
 import com.MultiCast.model.User;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 

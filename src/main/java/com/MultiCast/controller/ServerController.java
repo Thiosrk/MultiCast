@@ -1,8 +1,11 @@
 package com.MultiCast.controller;
 
+import com.MultiCast.model.Status;
+import com.MultiCast.service.StatusService;
 import com.MultiCast.util.MultiCast_Server;
 import com.MultiCast.util.MultipartFileUtil;
 import com.MultiCast.util.WebSocketServer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,10 +21,8 @@ public class ServerController {
 
     MultiCast_Server m;
 
-    @RequestMapping(value = "/broadcast",method = RequestMethod.GET)
-    public String welcome(){
-        return "login";
-    }
+    @Autowired
+    StatusService statusService;
 
     @RequestMapping(value = "/start",method = RequestMethod.GET)
     public String start(HttpServletRequest request){
@@ -29,10 +30,21 @@ public class ServerController {
         String filecontent = (String) session.getAttribute("filecontent");
         System.out.println("startserver!");
         System.out.println(filecontent);
-        m = MultiCast_Server.getInstance();
-        m.init();
-        m.send(filecontent);
-        return "redirect:/manager";
+        if (statusService.getStatusByHostname("server").getStatus()==1){
+            return "started";
+        }
+        if(filecontent == null){
+            return "nofile";
+        }else {
+            m = MultiCast_Server.getInstance();
+            m.init();
+            Status status = statusService.getStatusByHostname("server");
+            status.setStatus(1);
+            statusService.updateStatus(status);
+            m.send(filecontent);
+            return "redirect:/manager";
+        }
+
     }
 
     @RequestMapping("/uploadfile")
@@ -40,10 +52,6 @@ public class ServerController {
             , @RequestParam("file") MultipartFile[] files) throws Exception{
 
         HttpSession session = request.getSession();
-
-//        MultipartFileUtil.empty();
-//        MultipartFileUtil.toFiles(files);
-//        File file = MultipartFileUtil.getFileList().get(0);
         MultipartFile multipartFiles = files[0];
         InputStreamReader inputStreamReader = new InputStreamReader(multipartFiles.getInputStream(),"UTF-8");
         BufferedReader reader = new BufferedReader(inputStreamReader);
@@ -74,8 +82,14 @@ public class ServerController {
 
     @RequestMapping(value = "/close",method = RequestMethod.GET)
     public String stop(){
+        Status status = statusService.getStatusByHostname("server");
+        if (status.getStatus()==0){
+            return "noserver1";
+        }
         m = MultiCast_Server.getInstance();
         m.stop();
+        status.setStatus(0);
+        statusService.updateStatus(status);
         return "redirect:/manager";
     }
 

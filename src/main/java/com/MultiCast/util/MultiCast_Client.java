@@ -25,6 +25,8 @@ public class MultiCast_Client {
 
     long i;
 
+    int flag = 0;
+
     private MultiCast_Client() {}
 
     private static class MultiCast_Client_Instance {
@@ -38,6 +40,7 @@ public class MultiCast_Client {
     public void init(){
         i = 0;
         exit = false;
+        flag = 1;
         try {
             socket = new MulticastSocket(BROADCAST_PORT);
             broadcastAddress = InetAddress.getByName(BROADCAST_IP);
@@ -48,15 +51,20 @@ public class MultiCast_Client {
 
     }
 
-    public void stop(){
+    public int stop(){
         exit = true;
         System.out.println("stop receive!");
         try {
+            if (flag == 0){
+                return 0;
+            }
             socket.leaveGroup(broadcastAddress);
-            socket.close();
+            flag = 0;
+//            socket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return 1;
     }
 
     public void receive(){
@@ -71,7 +79,11 @@ public class MultiCast_Client {
                         inPacket = new DatagramPacket(buf, buf.length); //接收数据的数据报
                         socket.receive(inPacket); //接收数据
                         String word = new String(buf,"UTF-8");
+                        String[] words = word.split(" ");
+                        String eng = words[0];
+                        String ch = words[1];
                         System.out.println(word); //输出接收到的数据
+                        System.out.println(eng+" and "+ch);
                         Thread.sleep(500);
                         if (i<=50){
                             wordsMap.put(i,word);
@@ -98,9 +110,9 @@ public class MultiCast_Client {
 
     public static void main(String[] args) {
         MultiCast_Client m = new MultiCast_Client();
-        m.init();
-        m.receive();
-//        m.stop();
+//        m.init();
+//        m.receive();
+        m.stop();
     }
 
 }

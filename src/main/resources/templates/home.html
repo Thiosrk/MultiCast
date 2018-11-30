@@ -47,18 +47,42 @@
         <div class="panel-body">
             <label >单词广播</label>
             <textarea class="form-control" th:text="${session.word}" rows="1" readonly></textarea>
-            <a class="btn btn-warning" th:href="@{/next}">下一个</a>
-            <div align="right">
-                <a class="btn btn-info" th:href="@{/receive}">开始接收</a>
-                <a class="btn btn-danger" th:href="@{/stop}">停止接收</a>
+
+            <div style="margin-top: 10px">
+                <div class="col-md-3">
+                    <a  class="btn btn-warning" th:href="@{/next}">下一个</a>
+                </div>
+                <div class="col-md-6">
+
+                </div>
+                <div class="col-md-3">
+                    <div align="right">
+                        <a  class="btn btn-info" th:href="@{/receive}" >开始接收</a>
+                        <a  class="btn btn-danger" th:href="@{/stop}" >停止接收</a>
+                    </div>
+                </div>
             </div>
 
         </div>
         <div class="panel-body">
-            <label >答题</label>
-            <text class="form-control" id="decodedData1"></text>
-            <input type="text" name="answer" class="form-control" placeholder="..."required>
-            <!--<input name="username" type="text" class="form-control" id="username" placeholder="username" required="required" >-->
+            <label>答题(中英互译)</label>
+            <textarea class="form-control" th:text="${session.question}" rows="1" readonly></textarea>
+            <input type="text" name="answer" class="form-control" placeholder="请输入你的答案" required>
+            <textarea id="answer1" class="form-control" style="display: none" th:text="${session.answer}" rows="1" readonly ></textarea>
+            <div style="margin-top: 10px">
+                <div class="col-md-3">
+                    <a class="btn btn-warning" th:href="@{/answer}">开始答题</a>
+                </div>
+                <div class="col-md-6">
+
+                </div>
+                <div class="col-md-3">
+                    <div align="right">
+                        <a  class="btn btn-info" th:href="@{/answer}" >下一题</a>
+                        <a  id="answer" class="btn btn-danger" onclick="show(this)">答案</a>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -122,38 +146,15 @@
 </script>
 
 <script>
-    var socket;
-    if(typeof(WebSocket) == "undefined") {
-        console.log("您的浏览器不支持WebSocket");
-    }else{
-        console.log("您的浏览器支持WebSocket");
-        //实现化WebSocket对象，指定要连接的服务器地址与端口  建立连接
-        //等同于socket = new WebSocket("ws://localhost:8083/checkcentersys/websocket/20");
-        socket = new WebSocket("${basePath}websocket".replace("http","ws"));
-        //打开事件
-        socket.onopen = function() {
-            console.log("Socket 已打开");
-            //socket.send("这是来自客户端的消息" + location.href + new Date());
-        };
-        //获得消息事件
-        socket.onmessage = function(msg) {
-            console.log(msg.data);
-            //发现消息进入    开始处理前端触发逻辑
-        };
-        //关闭事件
-        socket.onclose = function() {
-            console.log("Socket已关闭");
-        };
-        //发生了错误事件
-        socket.onerror = function() {
-            alert("Socket发生了错误");
-            //此时可以尝试刷新页面
+    function show(ele){
+        var id = ele.id;
+        // alert(id);
+        // var num,= $(classname.substring(classname.length-1))
+        if (id.search('answer') != -1) {
+            // var num =id.substring(id.indexOf('p')+1);
+            var $p = $("#answer1");
+            $p.slideToggle("slow");
         }
-        //离开页面时，关闭socket
-        //jquery1.8中已经被废弃，3.0中已经移除
-        // $(window).unload(function(){
-        //     socket.close();
-        //});
     }
 </script>
 

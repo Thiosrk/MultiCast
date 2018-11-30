@@ -1,6 +1,8 @@
 package com.MultiCast.controller;
 
+import com.MultiCast.model.Status;
 import com.MultiCast.model.User;
+import com.MultiCast.service.StatusService;
 import com.MultiCast.service.UserService;
 import com.MultiCast.util.MultiCast_Client;
 import com.MultiCast.util.MultipartFileUtil;
@@ -26,7 +28,14 @@ public class UserController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    StatusService statusService;
+
     MultiCast_Client m;
+
+    HashMap<Long,String> map;
+
+    int broadcastflag = 0;
 
     @RequestMapping("/home")
     public String home(){
@@ -34,7 +43,9 @@ public class UserController {
     }
 
     @RequestMapping("/manager")
-    public String manager(){
+    public String manager(Model model){
+        int status = statusService.getStatusByHostname("server").getStatus();
+        model.addAttribute("status",status);
         return "manager";
     }
 
@@ -56,11 +67,15 @@ public class UserController {
     @RequestMapping("/logout")
     public String logout(HttpServletRequest request){
         request.getSession().removeAttribute("username");
+        request.getSession().removeAttribute("word");
+        request.getSession().removeAttribute("key");
+        request.getSession().removeAttribute("question");
+        request.getSession().removeAttribute("answer");
         return "redirect:/";
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ModelAndView Register(Model model, HttpServletRequest request) {
+    public ModelAndView Register(HttpServletRequest request) {
         HttpSession httpSession = request.getSession();
         String username = request.getParameter("username");
         String password = request.getParameter("password");
@@ -70,7 +85,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public void Login(Model model, HttpServletRequest request,HttpServletResponse response) throws IOException {
+    public void Login(HttpServletRequest request,HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession();
         String username = request.getParameter("username");
         String password = request.getParameter("password");
@@ -106,56 +121,78 @@ public class UserController {
     }
 
     @RequestMapping("/receive")
-    public String receive(Model model, HttpServletRequest request){
-//        HashMap<Long,String> map = new HashMap<>();
+    public String receive(){
         m = MultiCast_Client.getInstance();
         m.init();
         m.receive();
-//        map = m.getWordsMap();
-//        Iterator iterator = map.entrySet().iterator();
-//        Map.Entry entry = (Map.Entry) iterator.next();
-//        long key = (long) entry.getKey();
-//        String word = map.get(key);
-//        model.addAttribute("word",word);
+        broadcastflag= 1;
         return "redirect:/home";
     }
 
     @RequestMapping("/next")
-    public String next(Model model, HttpServletRequest request){
+    public String next(HttpServletRequest request){
         HttpSession session = request.getSession();
-        HashMap<Long,String> map = new HashMap<>();
         m = MultiCast_Client.getInstance();
-//        m.init();
-//        m.receive();
         map = m.getWordsMap();
         String word;
+        if (statusService.getStatusByHostname("server").getStatus()==0){
+            return "noserver";
+        }
+        if(broadcastflag == 0){
+            return "nostart";
+        }
         long key;
         if (session.getAttribute("word") == null){
-            System.out.println("2222222222222222222222");
             Iterator iterator = map.entrySet().iterator();
             Map.Entry entry = (Map.Entry) iterator.next();
             key = (long) entry.getKey();
             word = map.get(key);
         }else {
-            word = (String)session.getAttribute("word");
             key = (long)session.getAttribute("key");
-            System.out.println("111111111111111111111111");
             key++;
             word = map.get(key);
         }
 
-
         System.out.println("get next word :"+word);
-//        model.addAttribute("word",word);
         session.setAttribute("key",key);
         session.setAttribute("word",word);
+        return "redirect:/home";
+    }
+
+    @RequestMapping("/answer")
+    public String answer(HttpServletRequest request){
+        HttpSession session = request.getSession();
+        m = MultiCast_Client.getInstance();
+        map = m.getWordsMap();
+        if (broadcastflag == 0 ){
+            return "nostart";
+        }
+        List<Long> keys = new ArrayList<>(map.keySet());
+        String word;
+        long key = keys.get(new Random().nextInt(keys.size()-1));
+        word = map.get(key);
+        String[] words = word.split(" ");
+        String eng = words[0];
+        String ch = words[1];
+        System.out.println(eng+" "+ch);
+        int flag = new Random().nextInt(2);
+        if (flag == 1){
+            session.setAttribute("question",eng);
+            session.setAttribute("answer",ch);
+        }else {
+            session.setAttribute("question",ch);
+            session.setAttribute("answer",eng);
+        }
         return "redirect:/home";
     }
 
     @RequestMapping("/stop")
     public String stop(){
         m = MultiCast_Client.getInstance();
-        m.stop();
+        broadcastflag = m.stop();
+        if (broadcastflag==0){
+            return "nostart";
+        }
         return "redirect:/home";
     }
 

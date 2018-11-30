@@ -51,14 +51,8 @@ public class MultiCast_Server {
 
     public void stop(){
         System.out.println("stop server!");
-//        Thread.currentThread().interrupt();
         exit = true;
         try {
-            String message = "stop server!";
-            byte[] buf = message.getBytes("UTF-8"); //发送信息
-//            socket.setLoopbackMode(false);
-            outPacket = new DatagramPacket(buf,buf.length,broadcastAddress,BROADCAST_PORT);
-            socket.send(outPacket);
             socket.leaveGroup(broadcastAddress);
             socket.close();
         } catch (IOException e) {
@@ -74,11 +68,10 @@ public class MultiCast_Server {
 
             @Override
             public void run() {
-//                Scanner s = new Scanner(System.in);
                 while(!exit){
                     try {
                         byte[] buf = words.get(i).getBytes("UTF-8"); //发送信息
-//            socket.setLoopbackMode(false);
+//            socket.setLoopbackMode(false);//取消循环播放
                         outPacket = new DatagramPacket(buf,buf.length,broadcastAddress,BROADCAST_PORT);
                         socket.send(outPacket);
                         Thread.sleep(1000);
@@ -111,16 +104,16 @@ public class MultiCast_Server {
 
     public static void main(String[] args) {
         MultiCast_Server m = MultiCast_Server.getInstance();
-        String a = "alter   改变\n" +
-                "burst   爆裂\n" +
+        String a = "alter 改变\n" +
+                "burst 爆裂\n" +
                 "dispose 处理\n" +
-                "blast   爆炸\n" +
+                "blast 爆炸\n" +
                 "consume 消耗\n" +
-                "split   分裂\n" +
-                "spit    唾弃\n" +
-                "spill   倒出\n" +
-                "slip    忽略\n" +
-                "slide   滑动";
+                "split 分裂\n" +
+                "spit 唾弃\n" +
+                "spill 倒出\n" +
+                "slip 忽略\n" +
+                "slide 滑动";
         m.init();
         m.send(a);
 //        m.stop();

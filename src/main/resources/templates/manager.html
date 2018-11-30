@@ -28,8 +28,8 @@
              id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <li><a href="/manager">主页</a></li>
-                <li><a href="#broadcast" data-toggle="tab">广播管理</a></li>
                 <li><a href="#upload" data-toggle="tab">上传广播文件</a></li>
+                <li><a href="#broadcast" data-toggle="tab">广播管理</a></li>
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
@@ -45,15 +45,35 @@
 <div class="row">
 
     <div class="tab-pane fade active in" id="broadcast">
+
         <div class="col-lg-offset-4 col-lg-6 panel-body">
-            <div class="container-fluid">
-                <a class="btn btn-info" th:href="@{/start}">开始广播</a>
-                <a class="btn btn-danger" th:href="@{/close}">停止广播</a>
-            </div>
+            <table class="display">
+                <thead>
+                <tr>
+                    <th>广播状态</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <a th:if="${status == 0}"  class="btn btn-primary btn-block" disabled="disabled">未开启</a>
+                        <a th:if="${status == 1}"  class="btn btn-success btn-block" disabled="disabled">广播中</a>
+                    </td>
+                    <td style="width: 10%">
+                        <a class="btn btn-info" th:href="@{/start}">开始广播</a>
+                    </td>
+                    <td style="width: 10%">
+                        <a class="btn btn-danger" th:href="@{/close}">停止广播</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
-    <div class="tab-pane fade " id="upload">
+    <div class="tab-pane fade" id="upload">
         <div class="col-lg-offset-4 col-lg-6 panel-body">
             <div class="container-fluid">
                 <form id="form" th:action="@{/uploadfile}" enctype="multipart/form-data" th:method="post">
@@ -71,13 +91,6 @@
 
 </div>
 
-
-
-
-
-
-
-<!--<input type="file" name="txt_file" id="txt_file" multiple class="file-loading" />-->
 </body>
 
 <script type="text/javascript" th:src="@{/js/jquery-3.3.1.min.js}"></script>
@@ -96,7 +109,7 @@
             allowedFileExtensions: ['txt'],//接收的文件后缀
             //uploadExtraData:{"id": 1, "fileName":'123.mp3'},
             uploadAsync: true, //默认异步上传
-            showUpload: true, //是否显示上传按钮
+            showUpload: false, //是否显示上传按钮
             showRemove : true, //显示移除按钮
             showPreview : true, //是否显示预览
             showCaption: false,//是否显示标题
